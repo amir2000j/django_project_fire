@@ -1,0 +1,14 @@
+APScheduler==3.10.4
+asgiref==3.7.2
+Django==5.0.3
+django-background-tasks==1.2.5
+django-compat==1.0.15
+pillow==10.2.0
+pyaes==1.6.1
+Pyrogram==2.0.106
+PySocks==1.7.1
+pytz==2024.1
+six==1.16.0
+sqlparse==0.4.4
+typing_extensions==4.10.0
+tzlocal==5.2
