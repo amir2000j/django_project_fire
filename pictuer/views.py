@@ -1,59 +1,48 @@
-import asyncio
-
+import json
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
-import base64
-from pictuer.config import *
+from django.views.decorators.csrf import csrf_protect
+from model.models import *
+from model.configuration import *
+import uuid
 
 
-def upload_image(request,id):
-
+@csrf_protect
+def upload_image(request, id):
     if request.method == 'GET':
-        return render(request, 'pictuer.html',{'id':id})
+
+        return render(request, 'pictuer.html', {'id': id})
     else:
+
         return HttpResponse("Only GET requests are supported for this view.")
 
 
+@csrf_protect
 def process_image(request):
-    if request.method == 'GET':
+    if request.method == 'POST':
+        global pic
+        global user
 
         try:
-            if " Get photo from front end ":
+            d = json.loads(request.body.decode('utf-8'))
+            pic = d['picture']
+            user = d['id']
+        except KeyError as e:
 
+            new_error = Error(f"{str(uuid.uuid4())}")
+            new_error.create_date = NOW
+            new_error.id = user
+            new_error.save()
+            return HttpResponse("key error")
 
-                d = request.META.get('QUERY_STRING')
+        new_picture = Picture(f"{str(uuid.uuid4())}")
+        new_picture.create_date = NOW_GMT
+        new_picture.id = user
+        new_picture.status = "False"
+        new_picture.picture = pic
+        new_picture.save()
 
-                id = d.split('-')[0]
-
-                d = d.replace(f"{id}-data:image/png;base64,", "")
-                decoded_data = base64.b64decode(d)
-
-                with open("pictuer/photo/imageToSave.png", "wb") as fh:
-                    fh.write(decoded_data)
-
-            if " Send photo to bot ":
-                status, response = asyncio.run(telegram(id))
-
-                if " return ":
-                    if status == 200 :
-                        return HttpResponse("Image processed successfully")
-                    else:
-                        return HttpResponse("Image processed Unsuccessfully to send ")
-        except:
-            return HttpResponse("Image processed Unsuccessful")
+        return HttpResponse("Successful")
 
     else:
         return HttpResponse("Only POST requests are supported for this view.")
-
-
-async def telegram(id):
-    bot = Client('bot', api_id=api_id, api_hash=api_hash, bot_token=bot_token, session_string=session_string)
-    try:
-        await bot.start()
-        await bot.send_photo(int(id), "pictuer/photo/imageToSave.png", "قربانی به دام افتاد")
-        await bot.stop()
-    except:
-        return 400, {}
-
-    return 200, {}
-

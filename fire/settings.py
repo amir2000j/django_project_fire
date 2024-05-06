@@ -25,7 +25,13 @@ SECRET_KEY = 'django-insecure-ed606_p2v)w25bal)+d7145sloi64r$&ovudz#k$ch%2aro5hb
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+#CORE and Security
 ALLOWED_HOSTS = []
+
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_CREDENTIALS = True
+
+CORS_ALLOW_METHODS = ['GET', 'OPTIONS', 'POST']
 
 
 # Application definition
@@ -38,6 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'pictuer',
+    'corsheaders'
 ]
 
 MIDDLEWARE = [
@@ -48,6 +55,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware'
 ]
 
 ROOT_URLCONF = 'fire.urls'

