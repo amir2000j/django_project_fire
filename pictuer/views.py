@@ -1,5 +1,5 @@
 import json
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_protect
 from model.models import *
@@ -46,3 +46,24 @@ def process_image(request):
 
     else:
         return HttpResponse("Only POST requests are supported for this view.")
+
+
+def send_picture(request):
+    auth_header = request.META.get('HTTP_AUTHORIZATION')
+    if request.method == "GET" and auth_header:
+        if auth_header == token:
+            lis = []
+            for picture in Picture.A():
+                if picture.status == "FALSE":
+                    lis.append({
+                        "id": picture.id,
+                        "picture": picture.picture
+                    })
+                    picture.status = "TRUE"
+                    picture.save()
+
+            return JsonResponse(lis, safe=False)
+        else:
+            return HttpResponse('Unauther', status=401)
+    else:
+        return HttpResponse("Token not found", status=400)

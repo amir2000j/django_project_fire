@@ -54,7 +54,8 @@ ERROR_SHEET = "1H9ZnJWwjxZtkTrkNrOQw8XZLrDa29qbEeAjBA7K_weI"
 HOST = ""
 local = "http://127.0.0.1:8000"
 
-
+#Token
+token = "ksgjnjew;aldsmksmflsdkekfmv654ef58wf4sa5efdd5fs1"
 
 
 
