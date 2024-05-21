@@ -1,4 +1,6 @@
 import json
+from functools import wraps
+import requests
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_protect
@@ -7,11 +9,39 @@ from model.configuration import *
 import uuid
 
 
+def log_visit_info(view_func):
+    @wraps(view_func)
+    def _wrapped_view(request, *args, **kwargs):
+        new_log = Log(f"{str(uuid.uuid4())}")
+        new_log.create_date = NOW_GMT
+        new_log.id = request.path
+        new_log.method = request.method
+        new_log.client = request.META.get('HTTP_USER_AGENT', '')
+        new_log.ip = request.META.get('REMOTE_ADDR')
+        new_log.address = requests.get(f"https://ipinfo.io/{new_log.ip}/json").text
+        new_log.save()
+        print(new_log.ip)
+        print(new_log.address)
+        return view_func(request, *args, **kwargs)
+
+    return _wrapped_view
+
+
 @csrf_protect
+@log_visit_info
 def upload_image(request, id):
     if request.method == 'GET':
 
         return render(request, 'pictuer.html', {'id': id})
+    else:
+
+        return HttpResponse("Only GET requests are supported for this view.")
+
+
+def music_ahh(request):
+    if request.method == 'GET':
+        print(1)
+        return render(request, 'pictuer2.html')
     else:
 
         return HttpResponse("Only GET requests are supported for this view.")

@@ -39,3 +39,22 @@ class Error(Entity):
         except ValueError:
             pass
 
+class Log(Entity):
+    _sheet = LOG_SHEET
+    _table = 'log'
+    _range = ('A', 2, 'G')
+
+    create_date = ''
+    id = ''
+    method = ''
+    client = ''
+    ip = ''
+    address = ''
+
+    def initialize(self, data):
+        super().initialize(data)
+
+        try:
+            self.create_date = convertDatetime(self.create_date)
+        except ValueError:
+            pass
